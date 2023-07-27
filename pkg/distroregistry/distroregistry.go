@@ -5,17 +5,22 @@ import (
 	"sort"
 	"strings"
 
+	logrus "github.com/sirupsen/logrus"
+
 	"github.com/osbuild/images/internal/common"
 	"github.com/osbuild/images/pkg/distro"
 	"github.com/osbuild/images/pkg/distro/fedora"
 	"github.com/osbuild/images/pkg/distro/rhel7"
 	"github.com/osbuild/images/pkg/distro/rhel8"
 	"github.com/osbuild/images/pkg/distro/rhel9"
+	"github.com/osbuild/images/pkg/distro/scos"
 )
 
 // When adding support for a new distribution, add it here.
 // Note that this is a constant, do not write to this array.
 var supportedDistros = []func() distro.Distro{
+	scos.NewRocky8,
+
 	fedora.NewF37,
 	fedora.NewF38,
 	fedora.NewF39,
@@ -75,6 +80,7 @@ func NewDefault() *Registry {
 	hostDistroName, _, _, _ := common.GetHostDistroName()
 	for _, supportedDistro := range supportedDistros {
 		distro := supportedDistro()
+		logrus.Info(distro.Name())
 		if distro.Name() == hostDistroName {
 			hostDistro = supportedDistro()
 		}
